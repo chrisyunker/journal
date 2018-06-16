@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+
+set -eu
+
+DEFAULT_JOURNAL_DIR=$HOME/journal
+
+usage() {
+    echo "Usage: $0 [+|-days | YYYY-MM-DD | MM-DD] [+|-days | YYYY-MM-DD | MM-DD]"
+}
+
+if [[ $# -eq 0 ]]; then
+    # no start argument: start date = today
+    START_YEAR=$(date +%Y)
+    START_MONTH=$(date +%m)
+    START_DAY=$(date +%d)
+elif [[ $1 =~ ^-[h?]$ ]]; then
+    # -h: Display usage message
+    usage
+    exit 0
+elif [[ $1 =~ ^([+-][0-9]+)$ ]]; then
+    # days: start date = (today +|- days)
+    START_YEAR=$(date -v"${BASH_REMATCH[1]}"d +%Y)
+    START_MONTH=$(date -v"${BASH_REMATCH[1]}"d +%m)
+    START_DAY=$(date -v"${BASH_REMATCH[1]}"d +%d)
+elif [[ $1 =~ ^([0-9]{1,2})-([0-9]{1,2})$ ]]; then
+    # MM-DD: start date = (current year)-MM-DD
+    START_YEAR=$(date +%Y)
+    START_MONTH=$(date -v"${BASH_REMATCH[1]}"m +%m)
+    START_DAY=$(date -v"${BASH_REMATCH[2]}"d +%d)
+elif [[ $1 =~ ^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})$ ]]; then
+    # YYYY-MM-DD: start date = YYYY-MM-DD
+    START_YEAR=$(date -v"${BASH_REMATCH[1]}"y +%Y)
+    START_MONTH=$(date -v"${BASH_REMATCH[2]}"m +%m)
+    START_DAY=$(date -v"${BASH_REMATCH[3]}"d +%d)
+else
+    echo "Invalid argument: $1"
+    usage
+    exit 1
+fi
+
+if [[ $# -lt 2 ]]; then
+    # no end argument: end date = today
+    END_YEAR=$(date +%Y)
+    END_MONTH=$(date +%m)
+    END_DAY=$(date +%d)
+elif [[ $2 =~ ^([+-][0-9]+)$ ]]; then
+    # days: end date = (today +|- days)
+    END_YEAR=$(date -v"${BASH_REMATCH[1]}"d +%Y)
+    END_MONTH=$(date -v"${BASH_REMATCH[1]}"d +%m)
+    END_DAY=$(date -v"${BASH_REMATCH[1]}"d +%d)
+elif [[ $2 =~ ^([0-9]{1,2})-([0-9]{1,2})$ ]]; then
+    # MM-DD: end date = (current year)-MM-DD
+    END_YEAR=$(date +%Y)
+    END_MONTH=$(date -v"${BASH_REMATCH[1]}"m +%m)
+    END_DAY=$(date -v"${BASH_REMATCH[2]}"d +%d)
+elif [[ $2 =~ ^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})$ ]]; then
+    # YYYY-MM-DD: end date = YYYY-MM-DD
+    END_YEAR=$(date -v"${BASH_REMATCH[1]}"y +%Y)
+    END_MONTH=$(date -v"${BASH_REMATCH[2]}"m +%m)
+    END_DAY=$(date -v"${BASH_REMATCH[3]}"d +%d)
+else
+    echo "Invalid argument: $2"
+    usage
+    exit 1
+fi
+
+horizontal_line() {
+    echo "========================================"
+}
+
+START_DATE="${START_YEAR}-${START_MONTH}-${START_DAY}"
+END_DATE="${END_YEAR}-${END_MONTH}-${END_DAY}"
+
+if [[ "${START_DATE}" > "${END_DATE}" ]]; then
+    echo "Invalid date range: [${START_DATE}] - [${END_DATE}]"
+    exit 1
+fi
+
+horizontal_line
+echo "${START_DATE} - ${END_DATE}"
+
+ROOT_DIR=${JOURNAL_DIR:-$DEFAULT_JOURNAL_DIR}
+
+YEAR=$START_YEAR
+MONTH=$START_MONTH
+DAY=$START_DAY
+
+while [[ ! "${YEAR}-${MONTH}-${DAY}" > "${END_DATE}" ]]; do
+
+    DIR=$ROOT_DIR/$YEAR/$MONTH
+    FILE=$DIR/${YEAR}-${MONTH}-${DAY}.md
+    if [ -f "$FILE" ]; then
+        horizontal_line
+        cat "$FILE"
+    fi
+
+    NEW_YEAR=$(date -j -f %Y-%m-%d -v+1d "${YEAR}-${MONTH}-${DAY}" +%Y)
+    NEW_MONTH=$(date -j -f %Y-%m-%d -v+1d "${YEAR}-${MONTH}-${DAY}" +%m)
+    NEW_DAY=$(date -j -f %Y-%m-%d -v+1d "${YEAR}-${MONTH}-${DAY}" +%d)
+    YEAR=$NEW_YEAR
+    MONTH=$NEW_MONTH
+    DAY=$NEW_DAY
+done
+horizontal_line
+
