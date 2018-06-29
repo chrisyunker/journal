@@ -19,12 +19,10 @@ Write to log for current day
 $ journal-write
 ```
 
-Write to log for different day using day offset
+Write to log for different day using day offset in the past
 
 ```
-$ journal-write +2
-
-$ journal-write -5
+$ journal-write 2
 ```
 
 Write to log for different day using date
@@ -37,7 +35,7 @@ $ journal-write 4-1
 
 ### Reading logs
 
-The `journal-read` command prints daily logs files in chronological order within a specified date range. It takes an optional two arguments to specify the start and end dates. Each argument can be either a day offset, or an explicit date.
+The `journal-read` command prints daily logs files in chronological order within a specified date range. It takes an optional two arguments to specify the start and end dates. Each argument can be either a day offset in the past, or an explicit date.
 
 If only a single argument is provided, it will specify the start date. The end date with be today's date.
 
@@ -55,7 +53,7 @@ Read logs between specified date and current date:
 ```
 $ journal-read 2017-10-01
 
-$ journal-read -3
+$ journal-read 3
 ```
 
 Read logs between specified date range:
@@ -65,7 +63,7 @@ $ journal-read 2017-10-01 2017-10-20
 
 $ journal-read 2017-10-01 -1
 
-$ journal-read -3 -1
+$ journal-read 3 1
 ```
 
 ###  Searching logs

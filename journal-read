@@ -5,7 +5,7 @@ set -eu
 DEFAULT_JOURNAL_DIR=$HOME/journal
 
 usage() {
-    echo "Usage: $0 [+|-days | YYYY-MM-DD | MM-DD] [+|-days | YYYY-MM-DD | MM-DD]"
+    echo "Usage: $0 [days ago | YYYY-MM-DD | MM-DD] [days ago | YYYY-MM-DD | MM-DD]"
 }
 
 if [[ $# -eq 0 ]]; then
@@ -17,11 +17,11 @@ elif [[ $1 =~ ^-[h?]$ ]]; then
     # -h: Display usage message
     usage
     exit 0
-elif [[ $1 =~ ^([+-][0-9]+)$ ]]; then
-    # days: start date = (today +|- days)
-    START_YEAR=$(date -v"${BASH_REMATCH[1]}"d +%Y)
-    START_MONTH=$(date -v"${BASH_REMATCH[1]}"d +%m)
-    START_DAY=$(date -v"${BASH_REMATCH[1]}"d +%d)
+elif [[ $1 =~ ^([0-9]+)$ ]]; then
+    # days: start date = (today - days)
+    START_YEAR=$(date -v"-${BASH_REMATCH[1]}"d +%Y)
+    START_MONTH=$(date -v"-${BASH_REMATCH[1]}"d +%m)
+    START_DAY=$(date -v"-${BASH_REMATCH[1]}"d +%d)
 elif [[ $1 =~ ^([0-9]{1,2})-([0-9]{1,2})$ ]]; then
     # MM-DD: start date = (current year)-MM-DD
     START_YEAR=$(date +%Y)
@@ -43,11 +43,11 @@ if [[ $# -lt 2 ]]; then
     END_YEAR=$(date +%Y)
     END_MONTH=$(date +%m)
     END_DAY=$(date +%d)
-elif [[ $2 =~ ^([+-][0-9]+)$ ]]; then
-    # days: end date = (today +|- days)
-    END_YEAR=$(date -v"${BASH_REMATCH[1]}"d +%Y)
-    END_MONTH=$(date -v"${BASH_REMATCH[1]}"d +%m)
-    END_DAY=$(date -v"${BASH_REMATCH[1]}"d +%d)
+elif [[ $2 =~ ^([0-9]+)$ ]]; then
+    # days: end date = (today - days)
+    END_YEAR=$(date -v"-${BASH_REMATCH[1]}"d +%Y)
+    END_MONTH=$(date -v"-${BASH_REMATCH[1]}"d +%m)
+    END_DAY=$(date -v"-${BASH_REMATCH[1]}"d +%d)
 elif [[ $2 =~ ^([0-9]{1,2})-([0-9]{1,2})$ ]]; then
     # MM-DD: end date = (current year)-MM-DD
     END_YEAR=$(date +%Y)

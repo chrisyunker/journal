@@ -5,7 +5,7 @@ set -eu
 DEFAULT_JOURNAL_DIR=$HOME/journal
 
 usage() {
-    echo "Usage: $0 [+|-days | YYYY-MM-DD | MM-DD]"
+    echo "Usage: $0 [days ago | YYYY-MM-DD | MM-DD]"
 }
 
 if [[ $# -eq 0 ]]; then
@@ -17,11 +17,11 @@ elif [[ $1 =~ ^-[h?]$ ]]; then
     # -h: Display usage message
     usage
     exit 0
-elif [[ $1 =~ ^([+-][0-9]+)$ ]]; then
-    # days: date = (today +|- days)
-    YEAR=$(date -v"${BASH_REMATCH[1]}"d +%Y)
-    MONTH=$(date -v"${BASH_REMATCH[1]}"d +%m)
-    DAY=$(date -v"${BASH_REMATCH[1]}"d +%d)
+elif [[ $1 =~ ^([0-9]+)$ ]]; then
+    # days: date = (today - days)
+    YEAR=$(date -v"-${BASH_REMATCH[1]}"d +%Y)
+    MONTH=$(date -v"-${BASH_REMATCH[1]}"d +%m)
+    DAY=$(date -v"-${BASH_REMATCH[1]}"d +%d)
 elif [[ $1 =~ ^([0-9]{1,2})-([0-9]{1,2})$ ]]; then
     # MM-DD: date = (current year)-MM-DD
     YEAR=$(date +%Y)
